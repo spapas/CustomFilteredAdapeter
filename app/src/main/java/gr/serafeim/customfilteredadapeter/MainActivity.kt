@@ -40,11 +40,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            return createViewFromResource(position, convertView, parent)
-        }
-
-        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            return createViewFromResource(position, convertView, parent)
+            val view: TextView = convertView as TextView? ?: LayoutInflater.from(context).inflate(layoutResource, parent, false) as TextView
+            view.text = "${mPois[position].name} ${mPois[position].city} (${mPois[position].category_name})"
+            return view
         }
 
         override fun getFilter(): Filter {
@@ -56,25 +54,18 @@ class MainActivity : AppCompatActivity() {
 
                 override fun performFiltering(charSequence: CharSequence?): Filter.FilterResults {
                     val queryString = charSequence?.toString()?.toLowerCase()
-                    var results: List<PoiDao> =
-                        if (queryString==null || queryString.isEmpty()) {
-                            allPois
-                        } else {
-                            allPois.filter {
-                                it.name.toLowerCase().contains(queryString) || it.city.contains(queryString) || it.category_name.contains(queryString)
-                            }
-                        }
+
                     val filterResults = Filter.FilterResults()
-                    filterResults.values = results
+                    filterResults.values = if (queryString==null || queryString.isEmpty()) {
+                        allPois
+                    } else {
+                        allPois.filter {
+                            it.name.toLowerCase().contains(queryString) || it.city.contains(queryString) || it.category_name.contains(queryString)
+                        }
+                    }
                     return filterResults
                 }
             }
-        }
-
-        private fun createViewFromResource(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view: TextView = convertView as TextView? ?: LayoutInflater.from(context).inflate(layoutResource, parent, false) as TextView
-            view.text = "${mPois[position].name} ${mPois[position].city} (${mPois[position].category_name})"
-            return view
         }
     }
 
@@ -82,14 +73,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val pois_array = listOf<PoiDao>(
+        val poisArray = listOf(
             PoiDao(1, "Taco Bell", "Athens", "Restaurant"),
-            PoiDao(2, "McDonalds", "Athens","Restaurant"),
+            PoiDao(2, "McDonald's", "Athens","Restaurant"),
             PoiDao(3, "KFC", "Piraeus", "Restaurant"),
             PoiDao(4, "Shell", "Lamia","Gas Station"),
             PoiDao(5, "BP", "Thessaloniki", "Gas Station")
         )
-        val adapter = PoiAdapter(this, android.R.layout.simple_list_item_1, pois_array)
+        val adapter = PoiAdapter(this, android.R.layout.simple_list_item_1, poisArray)
         autoCompleteTextView.setAdapter(adapter)
 
         autoCompleteTextView.setOnItemClickListener() { parent, _, position, id ->
