@@ -22,7 +22,8 @@ class MainActivity : AppCompatActivity() {
         val category_name: String
     )
 
-    inner class PoiAdapter(context: Context, @LayoutRes private val layoutResource: Int, private val allPois: List<PoiDao>): ArrayAdapter<PoiDao>(context, layoutResource, allPois),
+    inner class PoiAdapter(context: Context, @LayoutRes private val layoutResource: Int, private val allPois: List<PoiDao>):
+        ArrayAdapter<PoiDao>(context, layoutResource, allPois),
         Filterable {
         private var mPois: List<PoiDao> = allPois
 
@@ -56,15 +57,18 @@ class MainActivity : AppCompatActivity() {
                     val queryString = charSequence?.toString()?.toLowerCase()
 
                     val filterResults = Filter.FilterResults()
-                    filterResults.values = if (queryString==null || queryString.isEmpty()) {
+                    filterResults.values = if (queryString==null || queryString.isEmpty())
                         allPois
-                    } else {
+                    else
                         allPois.filter {
-                            it.name.toLowerCase().contains(queryString) || it.city.contains(queryString) || it.category_name.contains(queryString)
+                            it.name.toLowerCase().contains(queryString) ||
+                            it.city.toLowerCase().contains(queryString) ||
+                            it.category_name.toLowerCase().contains(queryString)
                         }
-                    }
+
                     return filterResults
                 }
+
             }
         }
     }
@@ -82,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         )
         val adapter = PoiAdapter(this, android.R.layout.simple_list_item_1, poisArray)
         autoCompleteTextView.setAdapter(adapter)
+        autoCompleteTextView.threshold = 3
 
         autoCompleteTextView.setOnItemClickListener() { parent, _, position, id ->
             val selectedPoi = parent.adapter.getItem(position) as PoiDao?
